@@ -1,0 +1,19 @@
+Please download the following Poppins font files from Google Fonts (https://fonts.google.com/specimen/Poppins):
+
+1. Poppins-Regular.ttf
+2. Poppins-Medium.ttf
+3. Poppins-SemiBold.ttf
+4. Poppins-Bold.ttf
+5. Poppins-Italic.ttf
+6. Poppins-Light.ttf
+
+Steps to download:
+1. Go to https://fonts.google.com/specimen/Poppins
+2. Click the "Download family" button
+3. Extract the downloaded zip file
+4. Copy the above .ttf files from the extracted folder to this directory (assets/fonts/)
+
+After adding the fonts, run:
+flutter pub get
+
+You can then use the font in your app by referencing 'Poppins' as the font family.
