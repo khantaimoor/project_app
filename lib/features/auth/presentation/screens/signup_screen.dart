@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:project_app/core/routes/app_routes.dart';
-import 'package:project_app/core/widgets/custom_button.dart';
-import 'package:project_app/core/widgets/custom_text_field.dart';
 import 'package:project_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:project_app/features/auth/presentation/bloc/auth_event.dart';
 import 'package:project_app/features/auth/presentation/bloc/auth_state.dart';
@@ -23,6 +20,9 @@ class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
   final _scrollController = ScrollController();
 
+  bool _obscurePassword = true;
+  bool _obscureConfirm = true;
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -34,10 +34,9 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Initialize ScreenUtil if not already done
-    ScreenUtil.init(context);
+    // If you initialize ScreenUtil globally (e.g. in main), you can remove this line.
+    // ScreenUtil.init(context);
 
-    // Get screen dimensions for better responsiveness
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
@@ -54,14 +53,13 @@ class _SignupScreenState extends State<SignupScreen> {
               SnackBar(
                 content: Text(state.message),
                 behavior: SnackBarBehavior.floating,
-                margin: EdgeInsets.all(16.w),
+                margin: const EdgeInsets.all(16.0),
               ),
             );
           }
         },
         builder: (context, state) {
           return Scaffold(
-            // Remove app bar to maximize space
             body: SafeArea(
               child: LayoutBuilder(
                 builder: (context, constraints) {
@@ -71,9 +69,8 @@ class _SignupScreenState extends State<SignupScreen> {
                     keyboardDismissBehavior:
                         ScrollViewKeyboardDismissBehavior.onDrag,
                     child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: constraints.maxHeight,
-                      ),
+                      constraints:
+                          BoxConstraints(minHeight: constraints.maxHeight),
                       child: IntrinsicHeight(
                         child: Padding(
                           padding: EdgeInsets.symmetric(
@@ -100,10 +97,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                   ),
                                 ),
 
-                                // Flexible spacing based on screen size
                                 SizedBox(height: screenHeight * 0.02),
 
-                                // Header section
+                                // Header
                                 Text(
                                   'Create Account',
                                   style: Theme.of(context)
@@ -115,7 +111,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                         fontWeight: FontWeight.bold,
                                       ),
                                 ),
-                                SizedBox(height: 8.0),
+                                const SizedBox(height: 8.0),
                                 Text(
                                   'Start tracking your special moments',
                                   style: Theme.of(context)
@@ -128,12 +124,11 @@ class _SignupScreenState extends State<SignupScreen> {
                                       ),
                                 ),
 
-                                // Adaptive spacing
                                 SizedBox(
                                     height: isKeyboardVisible ? 24.0 : 48.0),
 
-                                // Form fields
-                                CustomTextField(
+                                // Email
+                                _buildTextField(
                                   hintText: 'Email',
                                   controller: _emailController,
                                   keyboardType: TextInputType.emailAddress,
@@ -143,7 +138,6 @@ class _SignupScreenState extends State<SignupScreen> {
                                     if (value == null || value.isEmpty) {
                                       return 'Please enter your email';
                                     }
-                                    // Improved email validation
                                     final emailRegExp = RegExp(
                                         r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
                                     if (!emailRegExp.hasMatch(value)) {
@@ -152,14 +146,26 @@ class _SignupScreenState extends State<SignupScreen> {
                                     return null;
                                   },
                                 ),
-                                SizedBox(height: 16.h),
 
-                                CustomTextField(
+                                const SizedBox(height: 16.0),
+
+                                // Password
+                                _buildTextField(
                                   hintText: 'Password',
                                   controller: _passwordController,
-                                  obscureText: true,
+                                  obscureText: _obscurePassword,
                                   textInputAction: TextInputAction.next,
                                   prefixIcon: const Icon(Icons.lock_outline),
+                                  suffixIcon: IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _obscurePassword = !_obscurePassword;
+                                      });
+                                    },
+                                    icon: Icon(_obscurePassword
+                                        ? Icons.visibility_off
+                                        : Icons.visibility),
+                                  ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Please enter your password';
@@ -167,7 +173,6 @@ class _SignupScreenState extends State<SignupScreen> {
                                     if (value.length < 8) {
                                       return 'Password must be at least 8 characters';
                                     }
-                                    // Enhanced password validation
                                     if (!RegExp(
                                             r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)')
                                         .hasMatch(value)) {
@@ -176,14 +181,26 @@ class _SignupScreenState extends State<SignupScreen> {
                                     return null;
                                   },
                                 ),
-                                SizedBox(height: 16.h),
 
-                                CustomTextField(
+                                const SizedBox(height: 16.0),
+
+                                // Confirm Password
+                                _buildTextField(
                                   hintText: 'Confirm Password',
                                   controller: _confirmPasswordController,
-                                  obscureText: true,
+                                  obscureText: _obscureConfirm,
                                   textInputAction: TextInputAction.done,
                                   prefixIcon: const Icon(Icons.lock_outline),
+                                  suffixIcon: IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _obscureConfirm = !_obscureConfirm;
+                                      });
+                                    },
+                                    icon: Icon(_obscureConfirm
+                                        ? Icons.visibility_off
+                                        : Icons.visibility),
+                                  ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Please confirm your password';
@@ -193,33 +210,51 @@ class _SignupScreenState extends State<SignupScreen> {
                                     }
                                     return null;
                                   },
-                                  onFieldSubmitted: (_) {
+                                  // Use onEditingComplete (works with TextFormField)
+                                  onEditingComplete: () {
+                                    // When user taps "done" on keyboard
+                                    FocusScope.of(context).unfocus();
                                     if (_formKey.currentState!.validate()) {
                                       _handleSignup(context);
                                     }
                                   },
                                 ),
 
-                                // Adaptive spacing
                                 SizedBox(
-                                    height: isKeyboardVisible ? 24.h : 32.h),
+                                    height: isKeyboardVisible ? 24.0 : 32.0),
 
                                 // Sign up button
                                 SizedBox(
                                   width: double.infinity,
-                                  child: CustomButton(
-                                    text: 'Sign Up',
-                                    onPressed: () => _handleSignup(context),
-                                    isLoading: state is AuthLoading,
+                                  child: ElevatedButton(
+                                    onPressed: state is AuthLoading
+                                        ? null
+                                        : () => _handleSignup(context),
+                                    style: ElevatedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 16.0),
+                                    ),
+                                    child: state is AuthLoading
+                                        ? const SizedBox(
+                                            height: 20,
+                                            width: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2.2,
+                                              valueColor:
+                                                  AlwaysStoppedAnimation(
+                                                      Colors.white),
+                                            ),
+                                          )
+                                        : const Text('Sign Up'),
                                   ),
                                 ),
 
-                                // Spacer to push content to bottom when needed
                                 if (!isKeyboardVisible) const Spacer(),
 
-                                // Sign in link
                                 SizedBox(
-                                    height: isKeyboardVisible ? 16.h : 24.h),
+                                    height: isKeyboardVisible ? 16.0 : 24.0),
+
+                                // Sign in link
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -229,9 +264,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                         style: Theme.of(context)
                                             .textTheme
                                             .bodyMedium
-                                            ?.copyWith(
-                                              fontSize: 14.sp,
-                                            ),
+                                            ?.copyWith(fontSize: 14.0),
                                       ),
                                     ),
                                     TextButton(
@@ -239,8 +272,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                         Navigator.pop(context);
                                       },
                                       style: TextButton.styleFrom(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 8.w, vertical: 4.h),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8.0, vertical: 4.0),
                                         minimumSize: Size.zero,
                                         tapTargetSize:
                                             MaterialTapTargetSize.shrinkWrap,
@@ -254,15 +287,14 @@ class _SignupScreenState extends State<SignupScreen> {
                                               color: Theme.of(context)
                                                   .primaryColor,
                                               fontWeight: FontWeight.bold,
-                                              fontSize: 14.sp,
+                                              fontSize: 14.0,
                                             ),
                                       ),
                                     ),
                                   ],
                                 ),
 
-                                // Bottom padding for safe area
-                                SizedBox(height: 16.h),
+                                const SizedBox(height: 16.0),
                               ],
                             ),
                           ),
@@ -279,8 +311,38 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
+  Widget _buildTextField({
+    required String hintText,
+    required TextEditingController controller,
+    bool obscureText = false,
+    TextInputType keyboardType = TextInputType.text,
+    TextInputAction textInputAction = TextInputAction.next,
+    Widget? prefixIcon,
+    Widget? suffixIcon,
+    String? Function(String?)? validator,
+    VoidCallback? onEditingComplete,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      textInputAction: textInputAction,
+      obscureText: obscureText,
+      onEditingComplete: onEditingComplete,
+      validator: validator,
+      decoration: InputDecoration(
+        hintText: hintText,
+        prefixIcon: prefixIcon,
+        suffixIcon: suffixIcon,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 12.0, vertical: 14.0),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+      ),
+    );
+  }
+
   void _handleSignup(BuildContext context) {
-    // Dismiss keyboard
     FocusScope.of(context).unfocus();
 
     if (_formKey.currentState!.validate()) {
