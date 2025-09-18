@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_app/core/utils/animation_service.dart';
 import 'package:project_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:project_app/features/auth/presentation/screens/signup_screen.dart';
 import 'package:project_app/features/auth/presentation/screens/forgot_password_screen.dart';
@@ -23,33 +24,52 @@ class AppRoutes {
   static const String profile = '/profile';
 
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
+    late final Widget page;
+
     switch (settings.name) {
       case splash:
-        return MaterialPageRoute(builder: (_) => const SplashScreen());
+        page = const SplashScreen();
+        break;
       case onboarding:
-        return MaterialPageRoute(builder: (_) => const OnboardingScreen());
+        page = const OnboardingScreen();
+        break;
       case login:
-        return MaterialPageRoute(builder: (_) => const LoginScreen());
+        page = const LoginScreen();
+        break;
       case signup:
-        return MaterialPageRoute(builder: (_) => const SignupScreen());
+        page = const SignupScreen();
+        break;
       case forgotPassword:
-        return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
+        page = const ForgotPasswordScreen();
+        break;
       case home:
-        return MaterialPageRoute(builder: (_) => const HomeScreen());
+        page = const HomeScreen();
+        break;
       case addEvent:
-        return MaterialPageRoute(builder: (_) => const AddEditEventScreen());
+        page = const AddEditEventScreen();
+        break;
       case editEvent:
         final event = settings.arguments as CountdownEvent;
-        return MaterialPageRoute(
-            builder: (_) => AddEditEventScreen(event: event));
+        page = AddEditEventScreen(event: event);
+        break;
       case eventDetail:
         final event = settings.arguments as CountdownEvent;
-        return MaterialPageRoute(
-            builder: (_) => EventDetailScreen(event: event));
+        page = EventDetailScreen(event: event);
+        break;
       case profile:
-        return MaterialPageRoute(builder: (_) => const ProfileScreen());
+        page = const ProfileScreen();
+        break;
       default:
-        return MaterialPageRoute(builder: (_) => const HomeScreen());
+        page = const Scaffold(
+          body: Center(
+            child: Text('Route not found'),
+          ),
+        );
     }
+
+    return AnimationService.createRoute(
+      page: page,
+      settings: settings,
+    );
   }
 }

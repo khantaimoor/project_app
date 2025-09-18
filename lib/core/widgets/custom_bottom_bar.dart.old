@@ -1,0 +1,233 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+class CustomBottomBar extends StatelessWidget {
+  final int selectedIndex;
+  final Function(int) onItemSelected;
+
+  const CustomBottomBar({
+    super.key,
+    required this.selectedIndex,
+    required this.onItemSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
+    return Container(
+      height: 80.h,
+      margin: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: theme.scaffoldBackgroundColor,
+        borderRadius: BorderRadius.circular(24.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildNavItem(
+                context: context,
+                icon: Icons.home_outlined,
+                selectedIcon: Icons.home_rounded,
+                label: 'Home',
+                index: 0,
+              ),
+              _buildNavItem(
+                context: context,
+                icon: Icons.grid_view_outlined,
+                selectedIcon: Icons.grid_view_rounded,
+                label: 'Categories',
+                index: 1,
+              ),
+              SizedBox(width: 60.w), // Space for center button
+              _buildNavItem(
+                context: context,
+                icon: Icons.calendar_today_outlined,
+                selectedIcon: Icons.calendar_today_rounded,
+                label: 'Calendar',
+                index: 2,
+              ),
+              _buildNavItem(
+                context: context,
+                icon: Icons.settings_outlined,
+                selectedIcon: Icons.settings_rounded,
+                label: 'Settings',
+                index: 3,
+              ),
+            ],
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            top: -5.h,
+            child: Center(
+              child: _buildAddButton(context),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem({
+    required BuildContext context,
+    required IconData icon,
+    required IconData selectedIcon,
+    required String label,
+    required int index,
+  }) {
+    final theme = Theme.of(context);
+    final isSelected = selectedIndex == index;
+    final color = isSelected 
+      ? theme.colorScheme.primary 
+      : theme.colorScheme.onSurface.withOpacity(0.7);
+
+    return InkWell(
+      onTap: () => onItemSelected(index),
+      borderRadius: BorderRadius.circular(12.r),
+      child: Container(
+        width: 60.w,
+        padding: EdgeInsets.symmetric(vertical: 8.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isSelected ? selectedIcon : icon,
+              color: color,
+              size: 24.r,
+            ),
+            SizedBox(height: 4.h),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 11.sp,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAddButton(BuildContext context) {
+    final theme = Theme.of(context);
+    
+    return GestureDetector(
+      onTap: () => onItemSelected(-1),
+      child: Container(
+        width: 56.w,
+        height: 56.w,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              theme.colorScheme.primary,
+              theme.colorScheme.secondary,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: theme.colorScheme.primary.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Icon(
+          Icons.add_rounded,
+          color: theme.colorScheme.onPrimary,
+          size: 32.r,
+        ),
+      ),
+    );
+  }
+                size: 24.sp,
+              ),
+            ),
+            SizedBox(height: 4.h),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 12.sp,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAddButton(BuildContext context) {
+    final theme = Theme.of(context);
+    
+    return GestureDetector(
+      onTap: () => onItemSelected(-1),
+      child: Container(
+        width: 56.w,
+        height: 56.w,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              theme.colorScheme.primary,
+              theme.colorScheme.secondary,
+            ],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: theme.colorScheme.primary.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Icon(
+          Icons.add_rounded,
+          color: theme.colorScheme.onPrimary,
+          size: 32.r,
+        ),
+        margin: EdgeInsets.only(bottom: 24.h),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Theme.of(context).primaryColor,
+              Theme.of(context).colorScheme.secondary,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).primaryColor.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Icon(
+          Icons.add,
+          color: Colors.white,
+          size: 32.sp,
+        ),
+      ),
+    );
+  }
+}

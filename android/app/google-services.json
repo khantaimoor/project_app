@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1050567331821",
+    "project_id": "countdown-app-c73af",
+    "storage_bucket": "countdown-app-c73af.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1050567331821:android:ecb47e1f0019000e2661e4",
+        "android_client_info": {
+          "package_name": "com.example.project_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2uLNIES2spu-KxMRLMWG1SVbaDo-kvDA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
