@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:project_app/core/routes/app_routes.dart';
-import 'package:project_app/core/widgets/custom_text_field.dart';
 import 'package:project_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:project_app/features/auth/presentation/bloc/auth_event.dart';
 import 'package:project_app/features/auth/presentation/bloc/auth_state.dart';

@@ -3,7 +3,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:project_app/features/home/domain/models/countdown_event.dart';
 
 class EventDetailScreen extends StatefulWidget {
@@ -30,7 +29,6 @@ class _EventDetailScreenState extends State<EventDetailScreen>
   late Animation<double> _rotationAnimation;
   late Animation<double> _scaleAnimation;
   late Animation<Offset> _slideAnimation;
-  late Animation<Color?> _colorAnimation;
 
   Duration _timeLeft = Duration.zero;
   bool _isEventPassed = false;
@@ -102,11 +100,6 @@ class _EventDetailScreenState extends State<EventDetailScreen>
       parent: _slideController,
       curve: Curves.easeOutCubic,
     ));
-
-    _colorAnimation = ColorTween(
-      begin: _gradientCombinations[0][0],
-      end: _gradientCombinations[0][1],
-    ).animate(_pulseController);
 
     // Start animations
     _scaleController.forward();
@@ -867,33 +860,6 @@ class _EventDetailScreenState extends State<EventDetailScreen>
 
   // Action methods
   void _shareEvent() {
-    final days = _timeLeft.inDays.abs();
-    final hours = (_timeLeft.inHours % 24).abs();
-    final minutes = (_timeLeft.inMinutes % 60).abs();
-
-    final String message = _isEventPassed
-        ? '''
-🎉 Event Update!
-
-"${widget.event.name}" has arrived! 
-
-Time to celebrate! ${widget.event.icon}
-
-#CountdownComplete #Celebration
-'''
-        : '''
-⏰ Countdown Alert!
-
-Event: ${widget.event.name}
-${widget.event.icon}
-
-Time Left: ${days}d ${hours}h ${minutes}m
-
-Mark your calendars! Can't wait to celebrate together! 🎈
-
-#Countdown #Event #${widget.event.name.replaceAll(' ', '')}
-''';
-
     // In a real app, you would use Share.share(message) here
     _showSnackBar('Event shared successfully!');
   }

@@ -26,13 +26,13 @@ class CountdownEvent {
     };
   }
 
-  factory CountdownEvent.fromMap(Map<String, dynamic> map) {
+  factory CountdownEvent.fromMap(Map<String, dynamic> map, [String? documentId]) {
     return CountdownEvent(
-      id: map['id'],
-      name: map['name'],
+      id: documentId ?? map['id'] ?? '',
+      name: map['name'] ?? '',
       date: DateTime.parse(map['date']),
       time: map['time'] != null ? DateTime.parse(map['time']) : null,
-      icon: map['icon'],
+      icon: map['icon'] ?? '🎉',
       notificationEnabled: map['notificationEnabled'] ?? false,
     );
   }

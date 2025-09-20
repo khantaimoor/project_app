@@ -1,14 +1,21 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_app/features/home/domain/models/countdown_event.dart'
     as model;
 import 'package:project_app/features/home/presentation/bloc/countdown_event.dart';
 import 'package:project_app/features/home/presentation/bloc/countdown_state.dart';
 
 class CountdownBloc extends Bloc<CountdownEventBase, CountdownState> {
-  // Temporary list to store events (will be replaced with Firebase later)
-  final List<model.CountdownEvent> _events = [];
+  final FirebaseFirestore _firestore;
+  final FirebaseAuth _auth;
 
-  CountdownBloc() : super(CountdownInitial()) {
+  CountdownBloc({
+    FirebaseFirestore? firestore,
+    FirebaseAuth? auth,
+  })  : _firestore = firestore ?? FirebaseFirestore.instance,
+        _auth = auth ?? FirebaseAuth.instance,
+        super(CountdownInitial()) {
     on<LoadCountdownEvents>(_onLoadCountdownEvents);
     on<AddCountdownEvent>(_onAddCountdownEvent);
     on<UpdateCountdownEvent>(_onUpdateCountdownEvent);
@@ -22,9 +29,25 @@ class CountdownBloc extends Bloc<CountdownEventBase, CountdownState> {
   ) async {
     try {
       emit(CountdownLoading());
-      // TODO: Replace with Firebase fetch
-      await Future.delayed(const Duration(seconds: 1)); // Simulated delay
-      emit(CountdownLoaded(_events));
+
+      final user = _auth.currentUser;
+      if (user == null) {
+        emit(CountdownError('User not authenticated'));
+        return;
+      }
+
+      final snapshot = await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('events')
+          .orderBy('date')
+          .get();
+
+      final events = snapshot.docs
+          .map((doc) => model.CountdownEvent.fromMap(doc.data(), doc.id))
+          .toList();
+
+      emit(CountdownLoaded(events));
     } catch (e) {
       emit(CountdownError(e.toString()));
     }
@@ -36,10 +59,21 @@ class CountdownBloc extends Bloc<CountdownEventBase, CountdownState> {
   ) async {
     try {
       emit(CountdownLoading());
-      // TODO: Replace with Firebase add
-      _events.add(event.event);
+
+      final user = _auth.currentUser;
+      if (user == null) {
+        emit(CountdownError('User not authenticated'));
+        return;
+      }
+
+      await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('events')
+          .add(event.event.toMap());
+
       emit(CountdownEventAdded());
-      emit(CountdownLoaded(_events));
+      add(LoadCountdownEvents());
     } catch (e) {
       emit(CountdownError(e.toString()));
     }
@@ -51,13 +85,22 @@ class CountdownBloc extends Bloc<CountdownEventBase, CountdownState> {
   ) async {
     try {
       emit(CountdownLoading());
-      // TODO: Replace with Firebase update
-      final index = _events.indexWhere((e) => e.id == event.event.id);
-      if (index != -1) {
-        _events[index] = event.event;
-        emit(CountdownEventUpdated());
-        emit(CountdownLoaded(_events));
+
+      final user = _auth.currentUser;
+      if (user == null) {
+        emit(CountdownError('User not authenticated'));
+        return;
       }
+
+      await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('events')
+          .doc(event.event.id)
+          .update(event.event.toMap());
+
+      emit(CountdownEventUpdated());
+      add(LoadCountdownEvents());
     } catch (e) {
       emit(CountdownError(e.toString()));
     }
@@ -69,10 +112,22 @@ class CountdownBloc extends Bloc<CountdownEventBase, CountdownState> {
   ) async {
     try {
       emit(CountdownLoading());
-      // TODO: Replace with Firebase delete
-      _events.removeWhere((e) => e.id == event.eventId);
+
+      final user = _auth.currentUser;
+      if (user == null) {
+        emit(CountdownError('User not authenticated'));
+        return;
+      }
+
+      await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('events')
+          .doc(event.eventId)
+          .delete();
+
       emit(CountdownEventDeleted());
-      emit(CountdownLoaded(_events));
+      add(LoadCountdownEvents());
     } catch (e) {
       emit(CountdownError(e.toString()));
     }
@@ -84,15 +139,22 @@ class CountdownBloc extends Bloc<CountdownEventBase, CountdownState> {
   ) async {
     try {
       emit(CountdownLoading());
-      // TODO: Replace with Firebase update
-      final index = _events.indexWhere((e) => e.id == event.eventId);
-      if (index != -1) {
-        _events[index] = _events[index].copyWith(
-          notificationEnabled: event.enabled,
-        );
-        emit(CountdownEventUpdated());
-        emit(CountdownLoaded(_events));
+
+      final user = _auth.currentUser;
+      if (user == null) {
+        emit(CountdownError('User not authenticated'));
+        return;
       }
+
+      await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('events')
+          .doc(event.eventId)
+          .update({'notificationEnabled': event.enabled});
+
+      emit(CountdownEventUpdated());
+      add(LoadCountdownEvents());
     } catch (e) {
       emit(CountdownError(e.toString()));
     }

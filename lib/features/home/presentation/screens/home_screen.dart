@@ -3,12 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:project_app/core/routes/app_routes.dart';
 import 'package:project_app/core/widgets/custom_bottom_bar.dart';
-import 'package:project_app/features/home/domain/models/countdown_event.dart';
 import 'package:project_app/features/home/presentation/bloc/countdown_bloc.dart';
 import 'package:project_app/features/home/presentation/bloc/countdown_event.dart';
 import 'package:project_app/features/home/presentation/bloc/countdown_state.dart';
 import 'package:project_app/features/home/presentation/widgets/countdown_card.dart';
-import 'package:project_app/features/profile/presentation/screens/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,26 +17,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-
-  void _onItemSelected(int index) {
-    if (index == -1) {
-      // Handle add button tap
-      Navigator.pushNamed(context, AppRoutes.addEvent);
-      return;
-    }
-
-    setState(() {
-      _selectedIndex = index;
-    });
-
-    // Handle navigation based on index
-    switch (index) {
-      case 3: // Settings
-        Navigator.pushNamed(context, AppRoutes.profile);
-        break;
-      // Add other cases as needed
-    }
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:project_app/core/widgets/custom_button.dart';
-import 'package:project_app/core/widgets/custom_text_field.dart';
 import 'package:project_app/features/home/domain/models/countdown_event.dart';
 import 'package:project_app/features/home/presentation/bloc/countdown_bloc.dart';
 import 'package:project_app/features/home/presentation/bloc/countdown_event.dart';
+import 'package:project_app/features/home/presentation/bloc/countdown_state.dart';
 
 class AddEditEventScreen extends StatefulWidget {
   final CountdownEvent? event;
@@ -34,16 +33,6 @@ class _AddEditEventScreenState extends State<AddEditEventScreen>
   late AnimationController _slideController;
   late Animation<double> _pulseAnimation;
   late Animation<Offset> _slideAnimation;
-
-  // Beautiful gradient colors
-  static const List<Color> _gradientColors = [
-    Color(0xFF667eea),
-    Color(0xFF764ba2),
-    Color(0xFFf093fb),
-    Color(0xFFf5576c),
-    Color(0xFF4facfe),
-    Color(0xFF00f2fe),
-  ];
 
   final List<Map<String, dynamic>> _iconCategories = [
     {
@@ -915,13 +904,9 @@ class _AddEditEventScreenState extends State<AddEditEventScreen>
 
     if (widget.event != null) {
       context.read<CountdownBloc>().add(UpdateCountdownEvent(event));
-      _showSnackBar('Event updated successfully!');
     } else {
       context.read<CountdownBloc>().add(AddCountdownEvent(event));
-      _showSnackBar('Event created successfully!');
     }
-
-    Navigator.pop(context);
   }
 
   void _deleteEvent() {
@@ -1050,16 +1035,6 @@ class _AddEditEventScreenState extends State<AddEditEventScreen>
 
   void _shareEvent() {
     if (_nameController.text.trim().isNotEmpty && _selectedDate != null) {
-      final String shareText = '''
-🎉 Save the Date! 
-
-Event: ${_nameController.text.trim()}
-Date: ${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}
-${_selectedTime != null ? 'Time: ${_selectedTime!.format(context)}' : ''}
-
-Looking forward to celebrating with you! $_selectedIcon
-''';
-
       // In a real app, you would use the share_plus package here
       _showSnackBar('Share functionality would be implemented here');
     } else {
@@ -1089,104 +1064,121 @@ Looking forward to celebrating with you! $_selectedIcon
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          _buildGradientBackground(),
-          SafeArea(
-            child: Column(
-              children: [
-                _buildCustomAppBar(),
-                Expanded(
-                  child: SlideTransition(
-                    position: _slideAnimation,
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.symmetric(horizontal: 24.w),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          children: [
-                            SizedBox(height: 40.h),
-                            _buildFloatingIconSelector(),
-                            SizedBox(height: 32.h),
-                            _buildGlassTextField(
-                              controller: _nameController,
-                              label: 'Event Name',
-                              hint: 'Enter your event name...',
-                            ),
-                            _buildDateTimeSection(),
-                            _buildGlassTextField(
-                              controller: _notesController,
-                              label: 'Notes',
-                              hint: 'Add notes about your event...',
-                              maxLines: 3,
-                            ),
-                            _buildFeatureCard(
-                              icon: Icons.notifications_outlined,
-                              title: 'Notifications',
-                              subtitle: _notificationEnabled
-                                  ? 'You\'ll receive reminders'
-                                  : 'Enable to get reminders',
-                              onTap: () {
-                                setState(() {
-                                  _notificationEnabled = !_notificationEnabled;
-                                });
-                              },
-                              gradient: const [
-                                Color(0xFF43e97b),
-                                Color(0xFF38f9d7)
+    return BlocProvider(
+      create: (context) => CountdownBloc(),
+      child: BlocListener<CountdownBloc, CountdownState>(
+        listener: (context, state) {
+          if (state is CountdownEventAdded) {
+            _showSnackBar('Event created successfully!');
+            Navigator.pop(context);
+          } else if (state is CountdownEventUpdated) {
+            _showSnackBar('Event updated successfully!');
+            Navigator.pop(context);
+          } else if (state is CountdownError) {
+            _showSnackBar('Error: ${state.message}', isError: true);
+          }
+        },
+        child: Scaffold(
+          body: Stack(
+            children: [
+              _buildGradientBackground(),
+              SafeArea(
+                child: Column(
+                  children: [
+                    _buildCustomAppBar(),
+                    Expanded(
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: SingleChildScrollView(
+                          padding: EdgeInsets.symmetric(horizontal: 24.w),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              children: [
+                                SizedBox(height: 40.h),
+                                _buildFloatingIconSelector(),
+                                SizedBox(height: 32.h),
+                                _buildGlassTextField(
+                                  controller: _nameController,
+                                  label: 'Event Name',
+                                  hint: 'Enter your event name...',
+                                ),
+                                _buildDateTimeSection(),
+                                _buildGlassTextField(
+                                  controller: _notesController,
+                                  label: 'Notes',
+                                  hint: 'Add notes about your event...',
+                                  maxLines: 3,
+                                ),
+                                _buildFeatureCard(
+                                  icon: Icons.notifications_outlined,
+                                  title: 'Notifications',
+                                  subtitle: _notificationEnabled
+                                      ? 'You\'ll receive reminders'
+                                      : 'Enable to get reminders',
+                                  onTap: () {
+                                    setState(() {
+                                      _notificationEnabled =
+                                          !_notificationEnabled;
+                                    });
+                                  },
+                                  gradient: const [
+                                    Color(0xFF43e97b),
+                                    Color(0xFF38f9d7)
+                                  ],
+                                  trailing: Switch(
+                                    value: _notificationEnabled,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _notificationEnabled = value;
+                                      });
+                                    },
+                                    activeColor: const Color(0xFF43e97b),
+                                    activeTrackColor: const Color(0xFF43e97b)
+                                        .withOpacity(0.3),
+                                    inactiveThumbColor:
+                                        Colors.white.withOpacity(0.5),
+                                    inactiveTrackColor:
+                                        Colors.white.withOpacity(0.2),
+                                  ),
+                                ),
+                                _buildFeatureCard(
+                                  icon: Icons.palette_outlined,
+                                  title: 'Theme & Background',
+                                  subtitle: 'Customize your event appearance',
+                                  onTap: () {
+                                    _showSnackBar(
+                                        'Theme customization coming soon!');
+                                  },
+                                  gradient: const [
+                                    Color(0xFFfa709a),
+                                    Color(0xFFfee140)
+                                  ],
+                                ),
+                                _buildFeatureCard(
+                                  icon: Icons.group_outlined,
+                                  title: 'Invite Friends',
+                                  subtitle: 'Share with friends and family',
+                                  onTap: _shareEvent,
+                                  gradient: const [
+                                    Color(0xFF667eea),
+                                    Color(0xFF764ba2)
+                                  ],
+                                ),
+                                _buildSaveButton(),
+                                SizedBox(height: 40.h),
                               ],
-                              trailing: Switch(
-                                value: _notificationEnabled,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _notificationEnabled = value;
-                                  });
-                                },
-                                activeColor: const Color(0xFF43e97b),
-                                activeTrackColor:
-                                    const Color(0xFF43e97b).withOpacity(0.3),
-                                inactiveThumbColor:
-                                    Colors.white.withOpacity(0.5),
-                                inactiveTrackColor:
-                                    Colors.white.withOpacity(0.2),
-                              ),
                             ),
-                            _buildFeatureCard(
-                              icon: Icons.palette_outlined,
-                              title: 'Theme & Background',
-                              subtitle: 'Customize your event appearance',
-                              onTap: () {
-                                _showSnackBar(
-                                    'Theme customization coming soon!');
-                              },
-                              gradient: const [
-                                Color(0xFFfa709a),
-                                Color(0xFFfee140)
-                              ],
-                            ),
-                            _buildFeatureCard(
-                              icon: Icons.group_outlined,
-                              title: 'Invite Friends',
-                              subtitle: 'Share with friends and family',
-                              onTap: _shareEvent,
-                              gradient: const [
-                                Color(0xFF667eea),
-                                Color(0xFF764ba2)
-                              ],
-                            ),
-                            _buildSaveButton(),
-                            SizedBox(height: 40.h),
-                          ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

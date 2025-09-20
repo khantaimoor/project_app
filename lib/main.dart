@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:project_app/core/routes/app_routes.dart';
 import 'package:project_app/core/theme/app_theme.dart';
 import 'package:project_app/core/theme/theme_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
+  await Firebase.initializeApp();
+
   final prefs = await SharedPreferences.getInstance();
   final themeController = ThemeController(prefs);
   runApp(MyApp(themeController: themeController));

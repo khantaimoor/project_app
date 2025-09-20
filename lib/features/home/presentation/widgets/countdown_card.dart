@@ -16,28 +16,6 @@ class CountdownCard extends StatelessWidget {
     this.onNotificationToggle,
   });
 
-  String _getTimeLeft() {
-    final now = DateTime.now();
-    final difference = event.date.difference(now);
-
-    if (difference.isNegative) {
-      return 'Event has passed';
-    }
-
-    final days = difference.inDays;
-    if (days > 0) {
-      return '$days ${days == 1 ? 'day' : 'days'} left';
-    }
-
-    final hours = difference.inHours;
-    if (hours > 0) {
-      return '$hours ${hours == 1 ? 'hour' : 'hours'} left';
-    }
-
-    final minutes = difference.inMinutes;
-    return '$minutes ${minutes == 1 ? 'minute' : 'minutes'} left';
-  }
-
   Map<String, String> _getTimeComponents() {
     final now = DateTime.now();
     final difference = event.date.difference(now);
@@ -136,6 +114,7 @@ class CountdownCard extends StatelessWidget {
                         Positioned(
                           top: 16.h,
                           left: 16.w,
+                          right: 120.w, // Leave space for action buttons
                           child: Row(
                             children: [
                               Container(
@@ -150,12 +129,16 @@ class CountdownCard extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(width: 12.w),
-                              Text(
-                                event.name,
-                                style: TextStyle(
-                                  fontSize: 24.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                              Expanded(
+                                child: Text(
+                                  event.name,
+                                  style: TextStyle(
+                                    fontSize: 24.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
                                 ),
                               ),
                             ],

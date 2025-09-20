@@ -8,22 +8,22 @@ plugins {
 
 android {
     namespace = "com.example.project_app"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    compileSdk = 35  // Updated to match Android SDK version
+    ndkVersion = "25.1.8937393"  // Explicit NDK version
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17  // Updated from VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = '17'  // Updated from VERSION_1_8
     }
 
     defaultConfig {
         applicationId = "com.example.project_app"
-        minSdk = 21
-        targetSdk = 33
+        minSdk = 23  // Updated to support Firebase Auth
+        targetSdk = 35  // Updated to match compileSdk
         versionCode = 1
         versionName = "1.0.0"
         multiDexEnabled true
@@ -43,6 +43,13 @@ flutter {
 }
 
 dependencies {
-    implementation platform('com.google.firebase:firebase-bom:34.2.0')
+    // Import the Firebase BoM to manage Firebase library versions
+    implementation platform('com.google.firebase:firebase-bom:33.7.0')
+
+    // Firebase Analytics KTX without version, managed by BoM
     implementation 'com.google.firebase:firebase-analytics-ktx'
+    
+    // Add other Firebase dependencies that might be needed
+    implementation 'com.google.firebase:firebase-auth-ktx'
+    implementation 'com.google.firebase:firebase-firestore-ktx'
 }

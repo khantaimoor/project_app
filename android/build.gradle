@@ -1,15 +1,15 @@
 buildscript {
-    ext.kotlin_version = '1.7.10'
+    ext.kotlin_version = '1.9.10'  // Updated Kotlin version
+
     repositories {
-        google()
-        mavenCentral()
+        google()       // Required for Google services and Android tools
+        mavenCentral() // Central Maven repository
     }
 
     dependencies {
-        
-        classpath 'com.google.gms:google-services:4.4.3'
-        classpath 'com.android.tools.build:gradle:7.3.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.google.gms:google-services:4.4.3'  // Google Services plugin
+        classpath 'com.android.tools.build:gradle:8.1.0'  // Updated Android Gradle plugin
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version" // Kotlin Gradle plugin
     }
 }
 
@@ -21,9 +21,11 @@ allprojects {
 }
 
 rootProject.buildDir = '../build'
+
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
+
 subprojects {
     project.evaluationDependsOn(":app")
 }
